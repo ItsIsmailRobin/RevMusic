@@ -3,7 +3,7 @@
   "short_name": "Musichub",
   "icons": [
     {
-      "src": "favicon.png",
+      "src": "fav/favicon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
