@@ -3,7 +3,6 @@
 RevMusic is a web music app built using Next.js 14, App Router, and an unofficial music API. The user interface is styled with Tailwind CSS.
 
 [![Follow me](https://img.shields.io/github/followers/itsismailrobin?style=social)](itsismailrobin)
-[![Star this Repo](https://img.shields.io/github/stars/itsismailrobin/musichub?style=social)](https://github.com/ItsIsmailRobin/RevMusic)
 
 <br/>
 
