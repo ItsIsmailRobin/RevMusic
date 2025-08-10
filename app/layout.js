@@ -12,8 +12,8 @@ const bricolage_grotesque = Bricolage_Grotesque({
 });
 
 export const metadata = {
-  title: "MusicHub",
-  description: "Open-Source music streamer.",
+  title: "RevMusic",
+  description: "Next.js 14 Music Web - Rev666.",
   icons: "/fav/favicon.png",
   manifest: "/manifest.json",
 };
