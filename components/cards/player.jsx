@@ -87,13 +87,15 @@ export default function Player() {
         }
     }, [values.music]);
 
-    // ✅ Inject Media Session API for iOS lock screen artwork
+
+
+    // ✅ Inject Media Session API for iOS lock screen with live updates
     useEffect(() => {
-        if ("mediaSession" in navigator && data?.name) {
+        if ("mediaSession" in navigator && data?.name && audioURL) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: data?.name || "",
                 artist: data?.artists?.primary?.[0]?.name || "",
-                album: "", // optional
+                album: "",
                 artwork: [
                     { src: data?.image?.[2]?.url || data?.image?.[1]?.url || data?.image?.[0]?.url, sizes: '512x512', type: 'image/jpeg' }
                 ]
@@ -108,10 +110,35 @@ export default function Player() {
                 setPlaying(false);
             });
             navigator.mediaSession.setActionHandler("seekto", (e) => {
-                audioRef.current.currentTime = e.seekTime;
+                if (typeof e.seekTime === "number") {
+                    audioRef.current.currentTime = e.seekTime;
+                }
             });
+
+            // 🔹 Live update progress bar on lock screen
+            const updatePositionState = () => {
+                if ("setPositionState" in navigator.mediaSession && audioRef.current) {
+                    navigator.mediaSession.setPositionState({
+                        duration: audioRef.current.duration || 0,
+                        playbackRate: audioRef.current.playbackRate || 1,
+                        position: audioRef.current.currentTime || 0
+                    });
+                }
+            };
+
+            let interval;
+            if (playing) {
+                interval = setInterval(updatePositionState, 1000);
+            } else {
+                updatePositionState();
+            }
+
+            return () => {
+                if (interval) clearInterval(interval);
+            };
         }
-    }, [data, audioURL]);
+    }, [data, audioURL, playing]);
+
 
     return (
         <main>
