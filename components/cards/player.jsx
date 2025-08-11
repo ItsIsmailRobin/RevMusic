@@ -1,12 +1,11 @@
 "use client";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
-import { ExternalLink, Link2Icon, Pause, PauseCircle, Play, Repeat, Repeat1, X } from "lucide-react";
+import { ExternalLink, Repeat, Repeat1, X, Play } from "lucide-react";
 import { Slider } from "../ui/slider";
 import { getSongsById } from "@/lib/fetch";
 import Link from "next/link";
 import { MusicContext } from "@/hooks/use-context";
-import { toast } from "sonner";
 import { Skeleton } from "../ui/skeleton";
 import { IoPause } from "react-icons/io5";
 import { useMusic } from "../music-provider";
@@ -61,6 +60,7 @@ export default function Player() {
     };
 
     const { current, setCurrent } = useMusic();
+
     useEffect(() => {
         if (values.music) {
             getSong();
@@ -86,6 +86,33 @@ export default function Player() {
             };
         }
     }, [values.music]);
+
+    // ✅ Inject Media Session API for iOS lock screen artwork
+    useEffect(() => {
+        if ("mediaSession" in navigator && data?.name) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: data?.name || "",
+                artist: data?.artists?.primary?.[0]?.name || "",
+                album: "", // optional
+                artwork: [
+                    { src: data?.image?.[2]?.url || data?.image?.[1]?.url || data?.image?.[0]?.url, sizes: '512x512', type: 'image/jpeg' }
+                ]
+            });
+
+            navigator.mediaSession.setActionHandler("play", () => {
+                audioRef.current.play();
+                setPlaying(true);
+            });
+            navigator.mediaSession.setActionHandler("pause", () => {
+                audioRef.current.pause();
+                setPlaying(false);
+            });
+            navigator.mediaSession.setActionHandler("seekto", (e) => {
+                audioRef.current.currentTime = e.seekTime;
+            });
+        }
+    }, [data, audioURL]);
+
     return (
         <main>
             <audio autoPlay={playing} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedData={() => setDuration(audioRef.current.duration)} src={audioURL} ref={audioRef}></audio>
@@ -127,6 +154,6 @@ export default function Player() {
                     </div>
                 </div>
             </div>}
-        </main >
+        </main>
     )
 }
