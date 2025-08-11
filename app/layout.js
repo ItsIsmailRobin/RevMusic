@@ -14,15 +14,9 @@ const bricolage_grotesque = Bricolage_Grotesque({
 export const metadata = {
   title: "RevMusic",
   description: "Next.js 14 Music Web - Rev666.",
-  icons: {
-    icon: [
-      { url: "/fav/favicon.png", media: "(max-width: 767px)" }, // Mobile
-      { url: "/fav/favicon1.png", media: "(min-width: 768px)" } // Desktop
-    ],
-    manifest: "/manifest.json"
-  }
+  icons: "/fav/favicon.png",
+  manifest: "/manifest.json",
 };
-
 
 export default function RootLayout({ children }) {
   return (
