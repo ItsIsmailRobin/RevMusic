@@ -87,19 +87,21 @@ export default function Player() {
         }
     }, [values.music]);
 
-
-
-    // ✅ Inject Media Session API for iOS lock screen with live updates
+    // ✅ Improved Media Session API for iOS lock screen with smooth artwork updates
     useEffect(() => {
         if ("mediaSession" in navigator && data?.name && audioURL) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: data?.name || "",
-                artist: data?.artists?.primary?.[0]?.name || "",
-                album: "",
-                artwork: [
-                    { src: data?.image?.[2]?.url || data?.image?.[1]?.url || data?.image?.[0]?.url, sizes: '512x512', type: 'image/jpeg' }
-                ]
-            });
+            const updateMetadata = () => {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: data?.name || "",
+                    artist: data?.artists?.primary?.[0]?.name || "",
+                    album: "",
+                    artwork: [
+                        { src: data?.image?.[2]?.url || data?.image?.[1]?.url || data?.image?.[0]?.url, sizes: '512x512', type: 'image/jpeg' }
+                    ]
+                });
+            };
+
+            updateMetadata(); // Set immediately on song load
 
             navigator.mediaSession.setActionHandler("play", () => {
                 audioRef.current.play();
@@ -115,7 +117,7 @@ export default function Player() {
                 }
             });
 
-            // 🔹 Live update progress bar on lock screen
+            // 🔹 Keep position & artwork fresh for iOS lock screen
             const updatePositionState = () => {
                 if ("setPositionState" in navigator.mediaSession && audioRef.current) {
                     navigator.mediaSession.setPositionState({
@@ -124,6 +126,7 @@ export default function Player() {
                         position: audioRef.current.currentTime || 0
                     });
                 }
+                updateMetadata(); // refresh artwork/title if changed
             };
 
             let interval;
@@ -138,7 +141,6 @@ export default function Player() {
             };
         }
     }, [data, audioURL, playing]);
-
 
     return (
         <main>
@@ -181,6 +183,6 @@ export default function Player() {
                     </div>
                 </div>
             </div>}
-        </main>
+        </main >
     )
 }
